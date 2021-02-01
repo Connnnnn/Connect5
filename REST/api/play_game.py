@@ -12,7 +12,7 @@ class CreateGameApi(Resource):
         >>> from flask import Flask
         >>> from flask_restful import Api
         >>> from app import default_config
-        # Create flask app, config, and resftul api, then add MakeMoveApi route
+        # Create flask app, config, and resftul api, then add CreateGameApi route
         >>> app = Flask(__name__)
         >>> app.config.update(default_config)
         >>> api = Api(app=app)
@@ -34,19 +34,6 @@ class CreateGameApi(Resource):
         output = {'id': str(post_game.id)}
         return jsonify({'result': game_code})
 
-    @staticmethod
-    def patch(game_code: str) -> Response:
-        """
-        PATCH response method for adding a second player to an established game
-        :return: JSON object
-        """
-
-        data = request.get_json()
-        ##patch_game = game.objects(id=game_code).
-        patch_game = game.objects(id=game_code).update(**data)
-        output = {'id': str(patch_game).id}
-        return jsonify({'result': output})
-
 
 class JoinGameApi(Resource):
     """
@@ -55,7 +42,7 @@ class JoinGameApi(Resource):
         >>> from flask import Flask
         >>> from flask_restful import Api
         >>> from app import default_config
-        # Create flask app, config, and resftul api, then add MakeMoveApi route
+        # Create flask app, config, and resftul api, then add JoinGameApi route
         >>> app = Flask(__name__)
         >>> app.config.update(default_config)
         >>> api = Api(app=app)
@@ -63,15 +50,27 @@ class JoinGameApi(Resource):
         """
 
     @staticmethod
+    def get(game_code: str) -> Response:
+        """
+        GET response method for retrieving game info.
+        :return: JSON object
+        """
+
+        print(game_code)
+        game_info = game.objects.get(game_code=game_code)
+
+        return jsonify({'result': game_info})
+
+    @staticmethod
     def post(game_code: str) -> Response:
         """
-        GET response method for retrieving game code. Used to check game status and to add the second player
+        Post response method used to check game status and to add the second player
         :return: JSON object
         """
         player_2 = request.get_json().get('player_2')
 
         print(game_code)
-        gc = game.objects.get(game_code=game_code)
+        game_info = game.objects.get(game_code=game_code)
 
         my_client = pymongo.MongoClient("mongodb://localhost:27017/")
         my_db = my_client["test_db"]
@@ -81,7 +80,33 @@ class JoinGameApi(Resource):
         new_values = {"$set": {"player_2": player_2, "game_status": "ongoing"}}
         game_col.update_one(my_query, new_values)
 
-        return jsonify({'result': gc})
+        return jsonify({'result': game_info})
+
+
+class GetGameInfo(Resource):
+    """
+            Flask-resftul resource for connecting to open game
+            :Example:
+            >>> from flask import Flask
+            >>> from flask_restful import Api
+            >>> from app import default_config
+            # Create flask app, config, and resftul api, then add GetGameInfo route
+            >>> app = Flask(__name__)
+            >>> app.config.update(default_config)
+            >>> api = Api(app=app)
+            >>> api.add_resource(GetGameInfo, '/game/<game_code>/')
+            """
+    @staticmethod
+    def get(game_code: str) -> Response:
+        """
+        GET response method for retrieving game info.
+        :return: JSON object
+        """
+
+        print(f"Game Code - {game_code}")
+        game_info = game.objects.get(game_code=game_code)
+
+        return jsonify({'result': game_info})
 
 
 class MakeMoveApi(Resource):
@@ -106,4 +131,7 @@ class MakeMoveApi(Resource):
         # if curr_game.player1 is None:
         #    curr_game.player1 = us
         # elif curr_game.player2 is None:
-    #     curr_game.player2 = us
+        #   curr_game.player2 = us
+
+        ##Before board returned, check if game won
+

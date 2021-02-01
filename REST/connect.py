@@ -7,6 +7,7 @@ from PyInquirer import style_from_dict, Token, prompt, Separator
 from pprint import pprint
 # importing the requests library
 import requests
+import time
 
 style = style_from_dict({
     Token.Separator: '#cc5454',
@@ -143,19 +144,27 @@ class Account:
         game_code = hashlib.sha256(str(random.getrandbits(256)).encode('utf-8')).hexdigest()[:5]
         game_id = hashlib.sha256(str(random.getrandbits(256)).encode('utf-8')).hexdigest()[:10]
 
+        T = [[0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0]]
         # defining a params dict for the parameters to be sent to the API
         PARAMS = {
             "game_id": game_id,
             "game_code": game_code,
             "player_1": user_name,
-            "game_status": "open"
+            "game_status": "open",
+            "board": T
         }
         host = f"http://127.0.0.1:5000/host/{game_code}/"
         host_req = requests.post(url=host, json=PARAMS)
+        game_info = host_req.json()
 
         if host_req.status_code == 200:
             print("Game Made Successfully")
-            print(f"Your Game code is - {host_req.json()}")
+            print(f"Your Game code is - {game_code}")
             self.load_match(user_name, game_code)
         else:
             print("Problem creating game, please try again")
@@ -174,7 +183,6 @@ class Account:
 
         # checkUser api-endpoint
         join = f"http://127.0.0.1:5000/join/{game_code}/"
-        host = f"http://127.0.0.1:5000/host/{game_code}/"
 
         # defining a params dict for the parameters to be sent to the API
         PARAMS = {
@@ -183,27 +191,27 @@ class Account:
         }
 
         join_req = requests.post(url=join, json=PARAMS)
-        gc = join_req.json()
-        print(gc)
+        game_info = join_req.json()
 
         if join_req.status_code == 200:
-            print(f"Checking Game code...{gc.get('result').get('game_code')}")
-            if gc.get('result').get('game_code') == game_code:
+            print(f"Checking Game code...{game_info.get('result').get('game_code')}")
+            if game_info.get('result').get('game_code') == game_code:
                 print("Correct game code")
-                print(f"Checking Game Status...{gc.get('result').get('game_status')}")
+                print(f"Checking Game Status...{game_info.get('result').get('game_status')}")
 
-                if gc.get('result').get('game_status') == "open":
+                if game_info.get('result').get('game_status') == "open":
                     print("Joining lobby...")
                     self.load_match(user_name, game_code)
 
-                elif gc.get('result').get('game_status') == "ongoing":
-                    print("Lobby full")
+                elif game_info.get('result').get('game_status') == "ongoing" or game_info.get('result').get(
+                        'game_status') == "p1_turn" or game_info.get('result').get('game_status') == "p2_turn":
+                    print("Error - Game ongoing")
                     self.join(user_name)
-                elif gc.get('result').get('game_status') == "closed":
+                elif game_info.get('result').get('game_status') == "closed":
                     print("Game finished")
                     self.join(user_name)
                 else:
-                    print("Null Game Status")
+                    print("Error - Null Game Status")
                     self.join(user_name)
 
         else:
@@ -211,4 +219,68 @@ class Account:
             self.join(user_name)
 
     def load_match(self, user_name, game_code):
-        print("Woop")
+
+        # checkUser api-endpoint
+        game = f"http://127.0.0.1:5000/game/{game_code}/"
+
+        join_req = requests.get(url=game)
+        game_info = join_req.json()
+
+        p1 = game_info.get('result').get('player_1')
+        p2 = game_info.get('result').get('player_2')
+
+        print("Waiting for Other Player...")
+        while p2 is None:
+            time.sleep(5)
+            join_req = requests.get(url=game)
+            game_info = join_req.json()
+            p2 = game_info.get('result').get('player_2')
+
+        print(f"Player 1 is {p1}")
+
+        print(f"Player 2 is {p2}")
+
+        if user_name == p1:
+            print("GAME START")
+            self.make_move(game_code, user_name)
+        elif user_name == p2:
+            print("GAME START")
+            self.wait_for_move(game_code, user_name)
+
+    def make_move(self, game_code, user_name):
+        game = f"http://127.0.0.1:5000/game/{game_code}/"
+        join_req = requests.get(url=game)
+        game_info = join_req.json()
+
+        p1 = game_info.get('result').get('player_1')
+        p2 = game_info.get('result').get('player_2')
+
+        if user_name is p1:
+            print(f"Your turn {p1}!")
+        elif user_name is p2:
+            print(f"Your turn {p2}!")
+
+        ##check for win in make move api
+
+    def wait_for_move(self, game_code, user_name):
+        game = f"http://127.0.0.1:5000/game/{game_code}/"
+        join_req = requests.get(url=game)
+        game_info = join_req.json()
+
+        p1 = game_info.get('result').get('player_1')
+        p2 = game_info.get('result').get('player_2')
+
+        if user_name is p1:
+            print(f"Waiting for {p2} to make move...")
+        elif user_name is p2:
+            print(f"Waiting for {p1} to make move...")
+
+
+
+def main():
+    acc = Account()
+    acc.name_check()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,4 +1,4 @@
-from mongoengine import Document, StringField, ReferenceField
+from mongoengine import Document, StringField, ReferenceField, MultiPointField, ListField
 from models.user import user
 
 
@@ -25,5 +25,6 @@ class game(Document):
     player_1 = ReferenceField(user, required=True)
     player_2 = ReferenceField(user)
     game_status = StringField(required=True)
+    board = ListField()
 
 

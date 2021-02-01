@@ -12,6 +12,7 @@ from api.errors import unauthorized
 import datetime
 
 
+
 class SignUpApi(Resource):
     """
     Flask-resftul resource for creating new user.
@@ -42,6 +43,7 @@ class SignUpApi(Resource):
 
 
 class LoginApi(Resource):
+
     """
     Flask-resftul resource for retrieving user web token.
     :Example:
