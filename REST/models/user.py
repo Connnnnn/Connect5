@@ -32,10 +32,10 @@ class user(Document):
 
         """
 
-    userId = StringField(required=True)
+    userId = StringField(required=True, unique=True)
     password = StringField(required=True, min_length=6)
     access = EmbeddedDocumentField(Access, default=Access(user=True, admin=False))
-    userName = StringField()
+    userName = StringField(unique=True)
     numWins = IntField()
 
     def generate_pw_hash(self):

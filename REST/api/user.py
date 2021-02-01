@@ -67,6 +67,7 @@ class UserApi(Resource):
     >>> api = Api(app=app)
     >>> api.add_resource(UserApi, '/user/<user_id>')
     """
+
     @jwt_required
     def get(self, user_id: str) -> Response:
         """
