@@ -17,9 +17,5 @@ python ./get-pip.py
 
 pip install -r requirements.txt
 
-cd ..
-
-python -m app
-
 pause
 exit

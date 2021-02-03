@@ -27,7 +27,6 @@ class CreateGameApi(Resource):
         """
 
         data = request.get_json()
-        print(data)
         post_game = game(**data)
         post_game.save()
 
@@ -56,7 +55,6 @@ class JoinGameApi(Resource):
         :return: JSON object
         """
 
-        print(game_code)
         game_info = game.objects.get(game_code=game_code)
 
         return jsonify({'result': game_info})
@@ -69,7 +67,6 @@ class JoinGameApi(Resource):
         """
         player_2 = request.get_json().get('player_2')
 
-        print(game_code)
         game_info = game.objects.get(game_code=game_code)
 
         my_client = pymongo.MongoClient("mongodb://localhost:27017/")
@@ -104,7 +101,6 @@ class GetGameInfo(Resource):
         :return: JSON object
         """
 
-        print(f"Game Code - {game_code}")
         game_info = game.objects.get(game_code=game_code)
 
         return jsonify({'result': game_info})

@@ -70,8 +70,7 @@ class Account:
         PARAMS = {
             "userId": userId,
             "userName": user_name,
-            "password": password_input,
-            "numWins": 0
+            "password": password_input
         }
 
         reg_req = requests.post(url=check, json=PARAMS)
@@ -247,8 +246,8 @@ class Account:
 
     def make_move(self, game_code, user_name):
         game = f"http://127.0.0.1:5000/game/{game_code}/"
-        join_req = requests.get(url=game)
-        game_info = join_req.json()
+        info_req = requests.get(url=game)
+        game_info = info_req.json()
 
         p1 = game_info.get('result').get('player_1')
         p2 = game_info.get('result').get('player_2')

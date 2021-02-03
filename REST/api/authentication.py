@@ -23,7 +23,7 @@ class SignUpApi(Resource):
     >>> app = Flask(__name__)
     >>> app.config.update(default_config)
     >>> api = Api(app=app)
-    >>> api.add_resource(SignUpApi, '/authentication/signup')
+    >>> api.add_resource(SignUpApi, '/authentication/signup/')
     """
 
     @staticmethod
@@ -53,7 +53,7 @@ class LoginApi(Resource):
     >>> app = Flask(__name__)
     >>> app.config.update(default_config)
     >>> api = Api(app=app)
-    >>> api.add_resource(LoginApi, '/authentication/login')
+    >>> api.add_resource(LoginApi, '/authentication/login/')
     """
 
     @staticmethod
@@ -63,13 +63,8 @@ class LoginApi(Resource):
         :return: JSON object
         """
 
-        print(request)
-
         data = request.get_json()
-        print(data)
         us = user.objects.get(userName=data.get('userName'))
-
-        print(us.userName)
 
         auth_success = us.check_pw_hash(password=data.get('password'))
         if not auth_success:
@@ -84,6 +79,19 @@ class LoginApi(Resource):
 
 
 class CheckForUserApi(Resource):
+    """
+        Flask-resftul resource for checking if the user has an account
+        :Example:
+        >>> from flask import Flask
+        >>> from flask_restful import Api
+        >>> from app import default_config
+        # Create flask app, config, and resftul api, then add LoginApi route
+        >>> app = Flask(__name__)
+        >>> app.config.update(default_config)
+        >>> api = Api(app=app)
+        >>> api.add_resource(CheckForUserApi, '/authentication/checkUser/')
+        """
+
     @staticmethod
     def post() -> Response:
         """
