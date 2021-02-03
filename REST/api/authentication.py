@@ -12,7 +12,6 @@ from api.errors import unauthorized
 import datetime
 
 
-
 class SignUpApi(Resource):
     """
     Flask-resftul resource for creating new user.
@@ -69,6 +68,8 @@ class LoginApi(Resource):
         data = request.get_json()
         print(data)
         us = user.objects.get(userName=data.get('userName'))
+
+        print(us.userName)
 
         auth_success = us.check_pw_hash(password=data.get('password'))
         if not auth_success:

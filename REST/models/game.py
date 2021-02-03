@@ -1,4 +1,4 @@
-from mongoengine import Document, StringField, ReferenceField, MultiPointField, ListField
+from mongoengine import Document, StringField, ReferenceField, MultiPointField, ListField, IntField
 from models.user import user
 
 
@@ -22,9 +22,11 @@ class game(Document):
 
     game_id = StringField(required=True, unique=True)
     game_code = StringField(required=True)
-    player_1 = ReferenceField(user, required=True)
-    player_2 = ReferenceField(user)
+    player_1 = StringField(required=True)
+    player_2 = StringField()
     game_status = StringField(required=True)
     board = ListField()
+    move = IntField()
+    msg = ListField()
 
 

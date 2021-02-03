@@ -27,7 +27,7 @@ def create_routes(api):
     api.add_resource(ResultsApi, '/result/')
     api.add_resource(ResultApi, '/result/<result_id>/')
 
-    api.add_resource(MakeMoveApi, '/play/')
+    api.add_resource(MakeMoveApi, '/play/<game_code>/')
     api.add_resource(CreateGameApi, '/host/<game_code>/')
     api.add_resource(JoinGameApi, '/join/<game_code>/')
     api.add_resource(GetGameInfo, '/game/<game_code>/')
