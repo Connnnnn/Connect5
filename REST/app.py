@@ -1,7 +1,5 @@
 import os
-import jwt
 # flask packages
-import pymongo
 from flask import Flask, app
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
