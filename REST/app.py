@@ -9,13 +9,14 @@ from api.routes import create_routes
 
 # default mongodb configuration
 default_config = {'MONGODB_SETTINGS': {
-    'db': 'test_db',
-    'host': 'localhost',
-    'port': 27017,
+    'db': 'Connect',
+    'host': 'connect5.thcpu.mongodb.net',
+    #'port': 27017,
     'username': 'admin',
-    'password': 'password',
-    'authentication_source': 'admin'},
-    'JWT_SECRET_KEY': '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'}
+    'password': 'WHUwh7G8STmvO7IZ',
+    'authentication_source': 'admin'}
+    #'JWT_SECRET_KEY': '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
+}
 
 
 def get_flask_app(config: dict = None) -> app.Flask:
