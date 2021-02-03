@@ -4,7 +4,6 @@ from flask_restful import Resource
 from flask_jwt_extended import create_access_token, create_refresh_token
 
 # project resources
-from models.results import results
 from models.user import user
 from api.errors import unauthorized
 

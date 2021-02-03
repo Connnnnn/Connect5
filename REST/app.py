@@ -14,7 +14,6 @@ from api.routes import create_routes
 default_config = {'MONGODB_SETTINGS': {
     'db': 'Connect',
     'host': 'connect5.thcpu.mongodb.net',
-    # 'port': 27017,
     'username': 'admin',
     'password': 'WHUwh7G8STmvO7IZ',
     'authentication_source': 'admin'},

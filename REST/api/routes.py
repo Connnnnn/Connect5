@@ -1,6 +1,5 @@
 from flask_restful import Api
 
-from api.results import ResultsApi, ResultApi
 from api.authentication import SignUpApi, LoginApi, CheckForUserApi
 from api.play_game import MakeMoveApi, CreateGameApi, JoinGameApi, GetGameInfo
 from api.user import UsersApi, UserApi
@@ -21,9 +20,6 @@ def create_routes(api):
 
     api.add_resource(UsersApi, '/user/')
     api.add_resource(UserApi, '/user/<user_id>')
-
-    api.add_resource(ResultsApi, '/result/')
-    api.add_resource(ResultApi, '/result/<result_id>/')
 
     api.add_resource(MakeMoveApi, '/play/<game_code>/')
     api.add_resource(CreateGameApi, '/host/<game_code>/')
