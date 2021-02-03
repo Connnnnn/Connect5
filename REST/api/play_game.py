@@ -4,6 +4,7 @@ from models.game import game
 from api.errors import forbidden
 import pymongo
 
+DB_URL = "mongodb+srv://admin:WHUwh7G8STmvO7IZ@connect5.thcpu.mongodb.net/Connect5?retryWrites=true&w=majority"
 
 class CreateGameApi(Resource):
     """
@@ -69,8 +70,8 @@ class JoinGameApi(Resource):
 
         game_info = game.objects.get(game_code=game_code)
 
-        my_client = pymongo.MongoClient("mongodb://localhost:27017/")
-        my_db = my_client["test_db"]
+        my_client = pymongo.MongoClient(DB_URL)
+        my_db = my_client["Connect5"]
         game_col = my_db["game"]
 
         my_query = {"game_code": game_code}
@@ -115,8 +116,8 @@ class GetGameInfo(Resource):
         game_info = game.objects.get(game_code=game_code)
         turn = game_info.game_status
 
-        my_client = pymongo.MongoClient("mongodb://localhost:27017/")
-        my_db = my_client["test_db"]
+        my_client = pymongo.MongoClient(DB_URL)
+        my_db = my_client["Connect5"]
         game_col = my_db["game"]
         my_query = {"game_code": game_code}
 
@@ -164,8 +165,8 @@ class MakeMoveApi(Resource):
         active = False
         msg = None
 
-        my_client = pymongo.MongoClient("mongodb://localhost:27017/")
-        my_db = my_client["test_db"]
+        my_client = pymongo.MongoClient(DB_URL)
+        my_db = my_client["Connect5"]
         game_col = my_db["game"]
         my_query = {"game_code": game_code}
 
@@ -324,8 +325,8 @@ class MakeMoveApi(Resource):
                     if move < 5 and board[row][move + 4] == f"[{piece}]":
                         in_a_row_hor += 1
 
-        my_client = pymongo.MongoClient("mongodb://localhost:27017/")
-        my_db = my_client["test_db"]
+        my_client = pymongo.MongoClient(DB_URL)
+        my_db = my_client["Connect5"]
         game_col = my_db["game"]
         my_query = {"game_code": game_code}
 

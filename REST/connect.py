@@ -224,7 +224,7 @@ class Account:
 
         p1 = game_info.get('result').get('player_1')
         p2 = game_info.get('result').get('player_2')
-
+        print(p2)
         print("Waiting for Other Player...")
         while p2 is None:
             time.sleep(5)

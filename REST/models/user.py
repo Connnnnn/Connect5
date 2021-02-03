@@ -27,7 +27,7 @@ class user(Document):
         >>> from app import default_config
         >>> mongoengine.connect(**default_config['MONGODB_SETTINGS'])
         MongoClient(host=['localhost:27017'], document_class=dict, tz_aware=False, connect=True, read_preference=Primary())
-        >>> new_user = user(userId= "002", password= "password2",access={"admin": True}, userName= "Eve", numWins= "2")
+        >>> new_user = user(userId= "002", password= "password2",access={"admin": True}, userName= "Eve")
         >>> new_user.save()
 
         """

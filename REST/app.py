@@ -1,21 +1,24 @@
 import os
 import jwt
 # flask packages
+import pymongo
 from flask import Flask, app
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 from flask_mongoengine import MongoEngine
+from pymongo import MongoClient
+
 from api.routes import create_routes
 
 # default mongodb configuration
 default_config = {'MONGODB_SETTINGS': {
     'db': 'Connect',
     'host': 'connect5.thcpu.mongodb.net',
-    #'port': 27017,
+    # 'port': 27017,
     'username': 'admin',
     'password': 'WHUwh7G8STmvO7IZ',
-    'authentication_source': 'admin'}
-    #'JWT_SECRET_KEY': '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
+    'authentication_source': 'admin'},
+     'JWT_SECRET_KEY': 'B540E36ECF5803C5AFC1D239E9FC40256C2C85D35562D8341A72D96C25A08104'
 }
 
 
@@ -27,30 +30,24 @@ def get_flask_app(config: dict = None) -> app.Flask:
     :return: app
     """
     # init flask
-    flask_app = Flask(__name__)
+    app = Flask(__name__)
 
-    # configure app
-    config = default_config if config is None else config
-    flask_app.config.update(config)
+    DB_URI = "mongodb+srv://admin:WHUwh7G8STmvO7IZ@connect5.thcpu.mongodb.net/Connect5?retryWrites=true&w=majority"
 
-    # load config variables
-    if 'MONGODB_URI' in os.environ:
-        flask_app.config['MONGODB_SETTINGS'] = {'host': os.environ['MONGODB_URI'],
-                                                'retryWrites': False}
-    if 'JWT_SECRET_KEY' in os.environ:
-        flask_app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
+    app.config["MONGODB_HOST"] = DB_URI
+    app.config["JWT_SECRET_KEY"] = "B540E36ECF5803C5AFC1D239E9FC40256C2C85D35562D8341A72D96C25A08104"
 
     # init api and routes
-    api = Api(app=flask_app)
+    api = Api(app=app)
     create_routes(api=api)
 
     # init mongoengine
-    db = MongoEngine(app=flask_app)
+    db = MongoEngine(app=app)
 
     # init jwt manager
-    jwt = JWTManager(app=flask_app)
+    jwt = JWTManager(app=app)
 
-    return flask_app
+    return app
 
 
 if __name__ == '__main__':
