@@ -261,27 +261,27 @@ class Account:
         board = game_info.get('result').get('board')
         status = game_info.get('result').get('game_status')
 
+        winner = None
         valid_move = False
 
         for list in board:
             print(list)
 
         if status == "p1_wins":
-            print(f"{p1} wins!")
-            time.sleep(2)
-            print("Closing game")
-            time.sleep(1)
-            sys.exit("...")
+            winner = p1
 
         elif status == "p2_wins":
-            print(f"{p2} wins!")
-            time.sleep(2)
-            print("Closing game")
-            time.sleep(1)
-            sys.exit("...")
+            winner = p2
 
         elif status == "finished":
             print("Game over")
+            time.sleep(2)
+            print("Closing game")
+            time.sleep(1)
+            sys.exit("...")
+
+        if winner is not None:
+            print(f"{winner} wins!")
             time.sleep(2)
             print("Closing game")
             time.sleep(1)
