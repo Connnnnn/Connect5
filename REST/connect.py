@@ -132,7 +132,7 @@ class Account:
 
             self.join(user_name)
 
-        elif playType != "host" or playType != "join":
+        else:
             print("Incorrect Option, please Re-enter Lobby choice")
 
     def host(self, user_name):

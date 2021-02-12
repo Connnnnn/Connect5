@@ -6,6 +6,7 @@ import pymongo
 
 DB_URL = "mongodb+srv://admin:WHUwh7G8STmvO7IZ@connect5.thcpu.mongodb.net/Connect5?retryWrites=true&w=majority"
 
+
 class CreateGameApi(Resource):
     """
         Flask-resftul resource for creating game
