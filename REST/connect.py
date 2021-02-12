@@ -335,25 +335,18 @@ class Account:
 
         if user_name == p1:
             print(f"Waiting for {p2} to make move...")
-
-            while status == "p2_turn":
-                time.sleep(2)
-                join_req = requests.get(url=game)
-                game_info = join_req.json()
-                status = game_info.get('result').get('game_status')
-
-            self.make_move(game_code, user_name)
-
+            p = "p2"
         elif user_name == p2:
             print(f"Waiting for {p1} to make move...")
+            p = "p1"
 
-            while status == "p1_turn":
-                time.sleep(2)
-                join_req = requests.get(url=game)
-                game_info = join_req.json()
-                status = game_info.get('result').get('game_status')
+        while status == f"{p}_turn":
+            time.sleep(2)
+            join_req = requests.get(url=game)
+            game_info = join_req.json()
+            status = game_info.get('result').get('game_status')
 
-            self.make_move(game_code, user_name)
+        self.make_move(game_code, user_name)
 
 
 def main():
