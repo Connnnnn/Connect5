@@ -29,6 +29,7 @@ Tests can be found in the tests folder under ConnectTests.py
 
 ## Deploying 
 **Note : In order to connect to the database for the game to be operational, the config file is required. This can be sent upon request**
+
 In order to streamline the process, I have created two batch files.
 
 - The first is called prereqs.bat which is used for setting the python version, activating the virtual environment, downloading pip and then downloading all dependencies in the requirements.txt file. 
