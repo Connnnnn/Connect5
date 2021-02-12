@@ -6,6 +6,7 @@ from pyfiglet import Figlet
 from PyInquirer import style_from_dict, Token, prompt
 import requests
 import time
+import re
 
 style = style_from_dict({
     Token.Separator: '#cc5454',
@@ -64,6 +65,11 @@ class Account:
         # register api-endpoint
         check = "http://127.0.0.1:5000/authentication/signup/"
         password_input = reg_answers.get("password")
+
+        if not re.fullmatch(r'[A-Za-z0-9@#$%^&+=]{6,}', password_input):
+            print("Error, invalid password input - Please retry")
+            self.register(user_name)
+
         userId = hashlib.sha256(str(random.getrandbits(256)).encode('utf-8')).hexdigest()[:10]
 
         # defining a params dict for the parameters to be sent to the API
