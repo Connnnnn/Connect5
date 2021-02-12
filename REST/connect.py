@@ -132,8 +132,9 @@ class Account:
 
             self.join(user_name)
 
-        elif playType != "host" or playType != "join":
+        else:
             print("Incorrect Option, please Re-enter Lobby choice")
+            self.play(user_name)
 
     def host(self, user_name):
         game_code = hashlib.sha256(str(random.getrandbits(256)).encode('utf-8')).hexdigest()[:5]
