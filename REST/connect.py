@@ -261,6 +261,8 @@ class Account:
         board = game_info.get('result').get('board')
         status = game_info.get('result').get('game_status')
 
+        valid_move = False
+
         for list in board:
             print(list)
 
@@ -285,16 +287,26 @@ class Account:
             time.sleep(1)
             sys.exit("...")
 
-        questions = [
-            {
-                'type': 'input',
-                'message': 'Enter a number between 0-9 to make your move',
-                'name': 'move'
-            }
-        ]
+        while not valid_move:
+            questions = [
+                {
+                    'type': 'input',
+                    'message': 'Enter a number between 1-9 to make your move',
+                    'name': 'move'
+                }
+            ]
 
-        move_answer = prompt(questions, style=style)
-        curr_move = move_answer.get("move")
+            move_answer = prompt(questions, style=style)
+            curr_move = move_answer.get("move")
+
+            valid = "123456789"
+            for character in curr_move:
+                if character not in valid:
+                    valid_move = False
+                    print("Invalid move - Please retry")
+                    print(curr_move)
+                else:
+                    valid_move = True
 
         move_req = f"http://127.0.0.1:5000/play/{game_code}/"
 
