@@ -133,6 +133,20 @@ class GetGameInfo(Resource):
         return jsonify({'result': game_info})
 
 
+def check_for_win(board, piece, x, y, amount_in_a_row):
+    if 0 <= x < 6 and 0 <= y < 9:
+        if board[x][y] == f"[{piece}]":
+            amount_in_a_row = amount_in_a_row + 1
+
+            if amount_in_a_row == 5:
+                print("You've Won!")
+                return True, amount_in_a_row
+
+        else:
+            amount_in_a_row = 0
+    return False, amount_in_a_row
+
+
 class MakeMoveApi(Resource):
     """
     Flask-resftul resource for retrieving user web token.
@@ -200,76 +214,54 @@ class MakeMoveApi(Resource):
             game_over = True
             return jsonify({'result': game_info})
 
-            # Break out and say game over
         # Checking for the four different win types - Vertical, Horizontal, and the 2 diagonals
 
-        # Checking for diagonal win
-
-        diag_win = 0
-        for a in range(5, -5, -1):
-            x = row + a
-            y = column + a
-            if 0 <= x < 6 and 0 <= y < 9:
-                if board[x][y] == f"[{piece}]":
-                    diag_win = diag_win + 1
-
-                    if diag_win == 5:
-                        print("You've Won Diagonally!")
-                        break
-                else:
-                    diag_win = 0
-
-        vert_win = 0
         # Checking for vertical win
-        for b in range(4, -4, -1):
-            x = row + b
-            y = column
-            if 0 <= x < 6 and 0 <= y < 9:
-                if board[x][y] == f"[{piece}]":
-                    vert_win = vert_win + 1
-                    if vert_win == 5:
-                        print("You've Won Vertically!")
-                        break
-                else:
-                    vert_win = 0
 
-        diag2_win = 0
-        # Checking for the second diagonal win
-        for c in range(5, -5, -1):
-            x = row + c
-            y = column - c
+        vertical_win_check = False
+        vertical_pieces_in_a_row = 0
+        for a in range(5, -5, -1):
+            vertical_win_check, vertical_pieces_in_a_row = check_for_win(board, piece, row + a, column,
+                                                                         vertical_pieces_in_a_row)
+            if vertical_win_check is True:
+                break
 
-            if 0 <= x < 6 and 0 <= y < 9:
-                if board[x][y] == f"[{piece}]":
-                    diag2_win = diag_win + 1
+        # Checking for left diagonal win
 
-                    if diag2_win == 5:
-                        print("You've Won Diagonally!")
-                        break
-                else:
-                    diag2_win = 0
+        left_diagonal_win_check = False
+        left_diagonal_pieces_in_a_row = 0
+        for a in range(5, -5, -1):
+            left_diagonal_win_check, left_diagonal_pieces_in_a_row = check_for_win(board, piece, row + a, column + a,
+                                                                                   left_diagonal_pieces_in_a_row)
+            if left_diagonal_win_check is True:
+                break
 
-        hor_win = 0
+        # Checking for right diagonal win
+
+        right_diagonal_win_check = False
+        right_diagonal_pieces_in_a_row = 0
+        for a in range(5, -5, -1):
+            right_diagonal_win_check, right_diagonal_pieces_in_a_row = check_for_win(board, piece, row + a, column - a,
+                                                                                     right_diagonal_pieces_in_a_row)
+            if right_diagonal_win_check is True:
+                break
+
         # Checking for horizontal win
-        for d in range(5, -5, -1):
-            x = row
-            y = column + d
-            if 0 <= x < 6 and 0 <= y < 9:
-                if board[x][y] == f"[{piece}]":
-                    hor_win = hor_win + 1
 
-                    if hor_win == 5:
-                        print("You've Won Diagonally!")
-                        break
-                else:
-                    hor_win = 0
+        horizontal_win_check = False
+        horizontal_pieces_in_a_row = 0
+        for a in range(5, -5, -1):
+            horizontal_win_check, horizontal_pieces_in_a_row = check_for_win(board, piece, row, column + a,
+                                                                             horizontal_pieces_in_a_row)
+            if horizontal_win_check is True:
+                break
 
         my_client = pymongo.MongoClient(DB_URL)
         my_db = my_client["Connect5"]
         game_col = my_db["game"]
         my_query = {"game_code": game_code}
 
-        if diag_win >= 5 or diag2_win >= 5 or hor_win >= 5 or vert_win >= 5:
+        if left_diagonal_win_check is True or right_diagonal_win_check is True or horizontal_win_check is True or vertical_win_check is True:
             print(f"{curr_player} Wins!")
             if curr_player == p1_name:
                 new_values = {"$set": {"game_status": "p1_wins"}}
