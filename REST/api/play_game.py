@@ -133,6 +133,20 @@ class GetGameInfo(Resource):
         return jsonify({'result': game_info})
 
 
+def check_for_win(board, piece, x, y, amount_in_a_row):
+    if 0 <= x < 6 and 0 <= y < 9:
+        if board[x][y] == f"[{piece}]":
+            amount_in_a_row = amount_in_a_row + 1
+
+            if amount_in_a_row == 5:
+                print("You've Won!")
+                return True, amount_in_a_row
+
+        else:
+            amount_in_a_row = 0
+    return False, amount_in_a_row
+
+
 class MakeMoveApi(Resource):
     """
     Flask-resftul resource for retrieving user web token.
@@ -153,16 +167,12 @@ class MakeMoveApi(Resource):
         game_info = game.objects.get(game_code=game_code)
         status = data.get('game_status')
         board = data.get('board')
-        move = int(data.get('move'))
+        column = int(data.get('move'))
         piece = " "
         p1_name = game_info.player_1
         p2_name = game_info.player_2
         game_over = False
 
-        in_a_row_top_left = 1
-        in_a_row_top_right = 1
-        in_a_row_hor = 1
-        in_a_row_vert = 1
         active = False
         msg = None
 
@@ -183,7 +193,7 @@ class MakeMoveApi(Resource):
         row = 0
 
         if active:
-            move = move - 1
+            column = column - 1
             i = 5
             for i in range(5, -1, -1):
                 if i == -1:
@@ -194,8 +204,8 @@ class MakeMoveApi(Resource):
 
                     return jsonify({'result': game_info})
                     # Break out and tell them return original board and say re-enter
-                if board[i][move] != "[x]" and board[i][move] != "[o]":
-                    board[i][move] = f"[{piece}]"
+                if board[i][column] != "[x]" and board[i][column] != "[o]":
+                    board[i][column] = f"[{piece}]"
                     row = i
                     break
 
@@ -204,134 +214,54 @@ class MakeMoveApi(Resource):
             game_over = True
             return jsonify({'result': game_info})
 
-            # Break out and say game over
+        # Checking for the four different win types - Vertical, Horizontal, and the 2 diagonals
 
-        # Check for win
-        #
-        #
-        #          [a]        [b]        [c]
-        #          [d]     [row][move]   [e]
-        #          [f]        [g]        [h]
-        #
-        #   in_a_row_top_left is the diagonal line in both directions from a through middle and to h
-        #   in_a_row_top_right is the diagonal line in both directions from c through middle and to f
-        #   in_a_row_hor is the horizontal line in both directions from d through middle and to e
-        #   in_a_row_vert is the vertical line in both directions from b through middle and to g
+        # Checking for vertical win
 
-        # Checking for in_a_row_top_left win
+        vertical_win_check = False
+        vertical_pieces_in_a_row = 0
+        for a in range(5, -5, -1):
+            vertical_win_check, vertical_pieces_in_a_row = check_for_win(board, piece, row + a, column,
+                                                                         vertical_pieces_in_a_row)
+            if vertical_win_check is True:
+                break
 
-        # a
-        if row > 0 and move > 0 and board[row - 1][move - 1] == f"[{piece}]":
-            in_a_row_top_left += 1
+        # Checking for left diagonal win
 
-            if row > 1 and move > 1 and board[row - 2][move - 2] == f"[{piece}]":
-                in_a_row_top_left += 1
+        left_diagonal_win_check = False
+        left_diagonal_pieces_in_a_row = 0
+        for a in range(5, -5, -1):
+            left_diagonal_win_check, left_diagonal_pieces_in_a_row = check_for_win(board, piece, row + a, column + a,
+                                                                                   left_diagonal_pieces_in_a_row)
+            if left_diagonal_win_check is True:
+                break
 
-                if row > 2 and move > 2 and board[row - 3][move - 3] == f"[{piece}]":
-                    in_a_row_top_left += 1
+        # Checking for right diagonal win
 
-                    if row > 3 and move > 3 and board[row - 4][move - 4] == f"[{piece}]":
-                        in_a_row_top_left += 1
+        right_diagonal_win_check = False
+        right_diagonal_pieces_in_a_row = 0
+        for a in range(5, -5, -1):
+            right_diagonal_win_check, right_diagonal_pieces_in_a_row = check_for_win(board, piece, row + a, column - a,
+                                                                                     right_diagonal_pieces_in_a_row)
+            if right_diagonal_win_check is True:
+                break
 
-        # h
-        if row < 4 and move < 8 and board[row + 1][move + 1] == f"[{piece}]":
-            in_a_row_top_left += 1
+        # Checking for horizontal win
 
-            if row < 3 and move < 7 and board[row + 2][move + 2] == f"[{piece}]":
-                in_a_row_top_left += 1
-
-                if row < 2 and move < 6 and board[row + 3][move + 3] == f"[{piece}]":
-                    in_a_row_top_left += 1
-
-                    if row < 1 and move < 5 and board[row + 4][move + 4] == f"[{piece}]":
-                        in_a_row_top_left += 1
-
-        # Checking for in_a_row_vert win
-
-        # b
-        if row > 0 and board[row - 1][move] == f"[{piece}]":
-            in_a_row_vert += 1
-
-            if row > 1 and board[row - 2][move] == f"[{piece}]":
-                in_a_row_vert += 1
-
-                if row > 2 and board[row - 3][move] == f"[{piece}]":
-                    in_a_row_vert += 1
-
-                    if row > 3 and board[row - 4][move] == f"[{piece}]":
-                        in_a_row_vert += 1
-
-        #  g
-        if row < 5 and board[row + 1][move] == f"[{piece}]":
-            in_a_row_vert += 1
-
-            if row < 4 and board[row + 2][move] == f"[{piece}]":
-                in_a_row_vert += 1
-
-                if row < 3 and board[row + 3][move] == f"[{piece}]":
-                    in_a_row_vert += 1
-
-                    if row < 2 and board[row + 4][move] == f"[{piece}]":
-                        in_a_row_vert += 1
-
-        # Checking for in_a_row_top_right win
-
-        # c
-        if row > 0 and move < 8 and board[row - 1][move + 1] == f"[{piece}]":
-            in_a_row_top_right += 1
-
-            if row > 1 and move < 7 and board[row - 2][move + 2] == f"[{piece}]":
-                in_a_row_top_right += 1
-
-                if row > 2 and move < 6 and board[row - 3][move + 3] == f"[{piece}]":
-                    in_a_row_top_right += 1
-
-                    if row > 3 and move < 5 and board[row - 4][move + 4] == f"[{piece}]":
-                        in_a_row_top_right += 1
-
-        # f
-        if row < 5 and move > 0 and board[row + 1][move - 1] == f"[{piece}]":
-            in_a_row_top_right += 1
-
-            if row < 4 and move > 1 and board[row + 2][move - 2] == f"[{piece}]":
-                in_a_row_top_right += 1
-
-                if row < 3 and move > 2 and board[row + 3][move - 3] == f"[{piece}]":
-                    in_a_row_top_right += 1
-
-                    if row < 2 and move > 3 and board[row + 4][move - 4] == f"[{piece}]":
-                        in_a_row_top_right += 1
-
-        # Checking for in_a_row_hor win
-
-        # d
-
-        if move > 0 and board[row][move - 1] == f"[{piece}]":
-            in_a_row_hor += 1
-            if move > 1 and board[row][move - 2] == f"[{piece}]":
-                in_a_row_hor += 1
-                if move > 2 and board[row][move - 3] == f"[{piece}]":
-                    in_a_row_hor += 1
-                    if move > 3 and board[row][move - 4] == f"[{piece}]":
-                        in_a_row_hor += 1
-
-        # e
-
-        if move < 8 and board[row][move + 1] == f"[{piece}]":
-            in_a_row_hor += 1
-            if move < 7 and board[row][move + 2] == f"[{piece}]":
-                in_a_row_hor += 1
-                if move < 6 and board[row][move + 3] == f"[{piece}]":
-                    in_a_row_hor += 1
-                    if move < 5 and board[row][move + 4] == f"[{piece}]":
-                        in_a_row_hor += 1
+        horizontal_win_check = False
+        horizontal_pieces_in_a_row = 0
+        for a in range(5, -5, -1):
+            horizontal_win_check, horizontal_pieces_in_a_row = check_for_win(board, piece, row, column + a,
+                                                                             horizontal_pieces_in_a_row)
+            if horizontal_win_check is True:
+                break
 
         my_client = pymongo.MongoClient(DB_URL)
         my_db = my_client["Connect5"]
         game_col = my_db["game"]
         my_query = {"game_code": game_code}
 
-        if in_a_row_top_left >= 5 or in_a_row_top_right >= 5 or in_a_row_hor >= 5 or in_a_row_vert >= 5:
+        if left_diagonal_win_check is True or right_diagonal_win_check is True or horizontal_win_check is True or vertical_win_check is True:
             print(f"{curr_player} Wins!")
             if curr_player == p1_name:
                 new_values = {"$set": {"game_status": "p1_wins"}}

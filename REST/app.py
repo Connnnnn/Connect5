@@ -8,6 +8,11 @@ from pymongo import MongoClient
 from api.routes import create_routes
 import configparser
 
+parser = configparser.ConfigParser()
+parser.read("db_config.txt")
+default_config = parser.get("config", "default_config")
+
+
 def get_flask_app(config: dict = None) -> app.Flask:
     """
     Initializes Flask app with given configuration.
@@ -17,9 +22,6 @@ def get_flask_app(config: dict = None) -> app.Flask:
     """
     # init flask
     app = Flask(__name__)
-
-    parser = configparser.ConfigParser()
-    parser.read("db_config.txt")
 
     DB_URI = parser.get("config", "uri")
 
